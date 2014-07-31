@@ -21,6 +21,8 @@ class Local extends Model
             [['id', 'language'], 'required'],
             [['id', 'language'], 'string'],
 
+            [['components', 'params'], 'safe']
+
         ];
     }
 
@@ -59,7 +61,7 @@ class Local extends Model
         foreach ($models as $key => $model) {
             if (!is_array($model)) {
                 $validated = $model->validate() ? $validated : false;
-                $owner[$key] = $model->attributes;
+                $owner[$key] = array_merge($owner[$key], $model->attributes);
             } else {
                 $newData = $owner[$key];
                 $validated = $this->attachSubModels($model, $newData)

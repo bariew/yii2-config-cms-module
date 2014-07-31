@@ -61,7 +61,8 @@ class Local extends Model
         foreach ($models as $key => $model) {
             if (!is_array($model)) {
                 $validated = $model->validate() ? $validated : false;
-                $owner[$key] = array_merge($owner[$key], $model->attributes);
+                $owner[$key] = is_array($owner[$key])
+                    ? array_merge($owner[$key], $model->attributes) : $model->attributes;
             } else {
                 $newData = $owner[$key];
                 $validated = $this->attachSubModels($model, $newData)

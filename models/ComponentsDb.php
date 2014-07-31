@@ -45,7 +45,7 @@ class ComponentsDb extends Model
     {
         $model = new self();
         $model->attributes = (array) $config;
-        return $model->validate();
+        return !empty($config) && $model->validate();
     }
 
     public function init()

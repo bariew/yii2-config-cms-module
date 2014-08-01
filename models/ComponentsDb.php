@@ -4,6 +4,8 @@ namespace bariew\configModule\models;
 
 use Yii;
 use yii\base\Model;
+use yii\console\Application;
+use yii\console\Controller;
 
 class ComponentsDb extends Model
 {
@@ -37,7 +39,11 @@ class ComponentsDb extends Model
         }
 
         if (!$connection->isActive) {
-            $this->addError($attribute, "Could not connect to database");
+            return $this->addError($attribute, "Could not connect to database");
+        }
+
+        if (!$connection->schema->tableNames) {
+            $this->migrate();
         }
     }
 
@@ -54,5 +60,33 @@ class ComponentsDb extends Model
         if (isset($config['components']['db'])) {
             $this->attributes = $config['components']['db'];
         }
+    }
+
+    protected function migrate()
+    {
+        try {
+            $webApp = Yii::$app;
+            $consoleConfig = require_once Yii::getAlias('@app/config/console.php');
+            $consoleConfig['components']['db'] = $this->attributes;
+            $_SERVER['argv'] = ['migrate'];
+            Yii::$app = new Application($consoleConfig);
+            /**
+             * @var Controller $controller
+             */
+            $controller =  Yii::$app->createController('migrate')[0];
+            $controller->interactive = false;
+            error_reporting(E_ALL);
+            ini_set('display_errors', '1');
+            defined('YII_DEBUG') or define('YII_DEBUG', true);
+            defined('YII_ENV') or define('YII_ENV', 'dev');
+            $controller->runAction('up');
+            Yii::$app->response->clearOutputBuffers();
+            Yii::$app = $webApp;
+        } catch (\Exception $e) {
+            $this->addError('dsn', "Couldn't complete migrations");
+            return false;
+        }
+
+        return true;
     }
 }

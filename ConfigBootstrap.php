@@ -10,6 +10,7 @@ namespace bariew\configModule;
 use bariew\configModule\controllers\InstallController;
 use bariew\configModule\models\Local;
 use yii\base\BootstrapInterface;
+use yii\web\Application;
 
 /**
  * Bootstrap class initiates config check.
@@ -23,7 +24,7 @@ class ConfigBootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        if (!Local::validateConfig()) {
+        if (($app instanceof Application) && !Local::validateConfig()) {
             $module = new Module('config');
             $controller = new InstallController('install', $module);
             $controller->runAction('create');

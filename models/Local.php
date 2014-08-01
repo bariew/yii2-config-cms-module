@@ -4,6 +4,7 @@ namespace bariew\configModule\models;
 
 use Yii;
 use yii\base\Model;
+use yii\console\Application;
 use yii\db\Connection;
 
 class Local extends Model

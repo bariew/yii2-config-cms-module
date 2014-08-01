@@ -13,7 +13,7 @@ class Local extends Model
     public $components;
     public $params;
 
-    protected static $configPath = '@app/config/local.php';
+    protected static $configPath = '@app/config/local/main.php';
 
     public function rules()
     {

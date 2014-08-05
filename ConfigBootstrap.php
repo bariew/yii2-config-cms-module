@@ -24,7 +24,10 @@ class ConfigBootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        if (($app instanceof Application) && !Local::validateConfig()) {
+        if (!$app instanceof Application) {
+            return true;
+        }
+        if (!Local::validateConfig()) {
             $module = new Module('config');
             $controller = new InstallController('install', $module);
             $controller->runAction('create');

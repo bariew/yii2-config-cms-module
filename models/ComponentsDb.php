@@ -5,7 +5,7 @@ namespace bariew\configModule\models;
 use Yii;
 use yii\base\Model;
 use yii\console\Application;
-use yii\console\Controller;
+use yii\console\controllers\MigrateController;
 
 class ComponentsDb extends Model
 {
@@ -64,14 +64,14 @@ class ComponentsDb extends Model
 
     protected function migrate()
     {
+        $webApp = Yii::$app;
         try {
-            $webApp = Yii::$app;
             $consoleConfig = require_once Yii::getAlias('@app/config/console.php');
             $consoleConfig['components']['db'] = $this->attributes;
             $_SERVER['argv'] = ['migrate'];
             Yii::$app = new Application($consoleConfig);
             /**
-             * @var Controller $controller
+             * @var MigrateController $controller
              */
             $controller =  Yii::$app->createController('migrate')[0];
             $controller->interactive = false;
@@ -79,14 +79,16 @@ class ComponentsDb extends Model
             ini_set('display_errors', '1');
             defined('YII_DEBUG') or define('YII_DEBUG', true);
             defined('YII_ENV') or define('YII_ENV', 'dev');
+            defined('STDOUT') or define ('STDOUT', 'php://stdout');
             $controller->runAction('up');
             Yii::$app->response->clearOutputBuffers();
-            Yii::$app = $webApp;
         } catch (\Exception $e) {
-            $this->addError('dsn', "Couldn't complete migrations");
+            Yii::$app = $webApp;
+            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
+            $this->addError('dsn', $e->getMessage());
             return false;
         }
-
+        Yii::$app = $webApp;
         return true;
     }
 }

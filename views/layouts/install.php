@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\Alert;
 use yii\widgets\Breadcrumbs;
-use app\assets\AppAsset;
+use app\views\AppAsset;
 
 /**
  * @var \yii\web\View $this

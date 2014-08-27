@@ -17,6 +17,13 @@ class Params extends Model
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'adminEmail'    => Yii::t('modules/config', 'Admin email'),
+        ];
+    }
+
     public function init()
     {
         $config = Local::getConfig();

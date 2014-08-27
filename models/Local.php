@@ -30,7 +30,10 @@ class Local extends Model
     public function attributeLabels()
     {
         return [
-            'id'    => 'Application name',
+            'id'    => Yii::t('modules/config', 'Application name'),
+            'language' => Yii::t('modules/config', 'Language'),
+            'components' => Yii::t('modules/config', 'Components'),
+            'params' => Yii::t('modules/config', 'Params'),
         ];
     }
 

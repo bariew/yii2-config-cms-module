@@ -16,8 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?php echo Html::encode($this->title) ?></h1>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
         <?php echo Html::a(Yii::t('modules/config', 'Create {modelClass}', [
   'modelClass' => 'Email Config',

@@ -7,6 +7,7 @@ use yii\widgets\ActiveForm;
  * @var yii\web\View $this
  * @var bariew\configModule\models\EmailConfigSearch $model
  * @var yii\widgets\ActiveForm $form
+ *
  */
 ?>
 
@@ -26,8 +27,6 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'content') ?>
 
     <?php echo $form->field($model, 'owner_name') ?>
-
-    <?php // echo $form->field($model, 'owner_event') ?>
 
     <div class="form-group">
         <?php echo Html::submitButton(Yii::t('modules/config', 'Search'), ['class' => 'btn btn-primary']) ?>

@@ -24,6 +24,19 @@ class ComponentsDb extends Model
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'class' => Yii::t('modules/config', 'Class'),
+            'dsn' => Yii::t('modules/config', 'Connection string (dsn)'),
+            'username' => Yii::t('modules/config', 'Username'),
+            'password' => Yii::t('modules/config', 'Password'),
+            'charset' => Yii::t('modules/config', 'Charset'),
+            'enableSchemaCache' => Yii::t('modules/config', 'Enable schema cache'),
+            'schemaCacheDuration' => Yii::t('modules/config', 'Schema cache duration'),
+        ];
+    }
+
     public function dbValidate($attribute)
     {
         /**

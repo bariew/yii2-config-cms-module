@@ -7,7 +7,7 @@ use yii\helpers\Html;
  * @var bariew\configModule\models\EmailConfig $model
  */
 
-$this->title = 'Installation';
+$this->title = Yii::t('module/config', 'Installation');
 ?>
 <div class="email-config-create">
 

@@ -1,12 +1,14 @@
 <?php
 
-namespace bariew\configModule\models;
+namespace bariew\configModule\models\components;
 
+use bariew\configModule\components\Config;
 use Yii;
-use yii\base\Model;
 
-class ComponentsDb extends Model
+class Db extends Config
 {
+    protected static $key = ['components', 'db'];
+
     public $class = 'yii\db\Connection';
     public $dsn = 'mysql:host=localhost;dbname=cms';
     public $username = 'root';
@@ -54,19 +56,10 @@ class ComponentsDb extends Model
         }
     }
 
-    public static function validateConfig($config)
+    public static function validateConfig()
     {
         $model = new self();
-        $model->attributes = (array) $config;
-        return !empty($config) && $model->validate();
-    }
-
-    public function init()
-    {
-        $config = Local::getConfig();
-        if (isset($config['components']['db'])) {
-            $this->attributes = $config['components']['db'];
-        }
+        return $model->validate();
     }
 
 }

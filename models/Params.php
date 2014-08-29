@@ -2,12 +2,13 @@
 
 namespace bariew\configModule\models;
 
+use bariew\configModule\components\Config;
 use Yii;
-use yii\base\Model;
 
-class Params extends Model
+class Params extends Config
 {
     public $adminEmail;
+    protected static $key = ['params'];
 
     public function rules()
     {
@@ -22,13 +23,5 @@ class Params extends Model
         return [
             'adminEmail'    => Yii::t('modules/config', 'Admin email'),
         ];
-    }
-
-    public function init()
-    {
-        $config = Local::getConfig();
-        if (isset($config['params'])) {
-            $this->attributes = $config['params'];
-        }
     }
 }

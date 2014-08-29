@@ -7,8 +7,8 @@
 
 namespace bariew\configModule;
 
-use bariew\configModule\controllers\InstallController;
-use bariew\configModule\models\Local;
+use bariew\configModule\controllers\ItemController;
+use bariew\configModule\models\Main;
 use yii\base\BootstrapInterface;
 use yii\web\Application;
 
@@ -27,10 +27,11 @@ class ConfigBootstrap implements BootstrapInterface
         if (!$app instanceof Application) {
             return true;
         }
-        if (!Local::validateConfig()) {
+        if (!Main::validateConfig()) {
             $module = new Module('config');
-            $controller = new InstallController('install', $module);
-            $controller->runAction('create');
+            \Yii::$app->controller = $controller = new ItemController('item', $module);
+            echo $controller->runAction('update', ['name' => 'components\Db']);
+            \Yii::$app->end();
         }
     }
 }

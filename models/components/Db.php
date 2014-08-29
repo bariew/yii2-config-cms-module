@@ -7,8 +7,6 @@ use Yii;
 
 class Db extends Config
 {
-    protected static $key = ['components', 'db'];
-
     public $class = 'yii\db\Connection';
     public $dsn = 'mysql:host=localhost;dbname=cms';
     public $username = 'root';
@@ -61,5 +59,4 @@ class Db extends Config
         $model = new self();
         return $model->validate();
     }
-
 }

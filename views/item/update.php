@@ -8,7 +8,7 @@ use yii\helpers\Html;
  */
 
 $this->title = Yii::t('modules/config', 'Update {modelClass} config ', [
-  'modelClass' => $model->getName(),
+  'modelClass' => $model::getName(),
 ]);
 $this->params['breadcrumbs'][] = Yii::t('modules/config', 'Update');
 ?>

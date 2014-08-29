@@ -18,6 +18,7 @@ use Yii;
             <?= $form->field($model, $attribute)->textInput(); ?>
         <?php endforeach; ?>
         <div class="form-group">
+            <?php echo Html::a(Yii::t('modules/config', 'Reset'), ['delete', 'name'=>$model::getName()], ['class' => 'btn btn-danger']); ?>
             <?php echo Html::submitButton(Yii::t('modules/config', 'Save'), ['class' => 'btn btn-primary']); ?>
         </div>
     <?php ActiveForm::end(); ?>

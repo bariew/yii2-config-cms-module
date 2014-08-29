@@ -8,7 +8,6 @@ use Yii;
 class Params extends Config
 {
     public $adminEmail;
-    protected static $key = ['params'];
 
     public function rules()
     {

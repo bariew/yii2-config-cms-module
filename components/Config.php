@@ -8,8 +8,6 @@
 
 namespace bariew\configModule\components;
 
-
-use bariew\configModule\models\Params;
 use yii\base\Model;
 use Yii;
 use yii\helpers\FileHelper;
@@ -19,7 +17,7 @@ class Config extends Model
     protected static $localConfigPath = '@app/config/local/main.php';
     protected static $mainConfigPath = '@app/config/web.php';
 
-    protected static $key = [];
+    protected static $key;
 
     public function init()
     {
@@ -30,6 +28,16 @@ class Config extends Model
             }
             $this->$attribute = $value;
         }
+    }
+
+    public static function getKey()
+    {
+        if (static::$key !== null) {
+            return static::$key;
+        }
+        $keys = explode('\\', static::getName());
+        array_walk($keys, function (&$v) {$v = lcfirst($v);});
+        return $keys;
     }
 
     public static function listAll()
@@ -43,9 +51,19 @@ class Config extends Model
         return $result;
     }
 
-    public function getName()
+    public static function getName()
     {
-        return str_replace('bariew\configModule\models\\', '', get_called_class());
+        return str_replace(self::getBaseModelNamespace().'\\', '', get_called_class());
+    }
+
+    public static function getBaseModelNamespace()
+    {
+        return preg_replace('/components$/', 'models', __NAMESPACE__);
+    }
+
+    public static function getClass($name)
+    {
+        return self::getBaseModelNamespace(). '\\' . $name;
     }
 
     protected static function getMainConfig()
@@ -62,18 +80,32 @@ class Config extends Model
 
     public function save()
     {
-        if (!$this->validate()) {
+        if (!$this->validate() || !$this->beforeSave()) {
             return false;
         }
         $content = '<?php return '. var_export($this->setMyConfig(), true) . ';';
+        $result = file_put_contents(\Yii::getAlias(self::$localConfigPath), $content);
+        $this->afterSave();
+        return $result;
+    }
+
+    public function beforeSave() { return true;}
+    public function afterSave() {}
+
+    public function delete()
+    {
+        $content = '<?php return '. var_export($this->removeMyConfig(), true) . ';';
         return file_put_contents(\Yii::getAlias(self::$localConfigPath), $content);
     }
 
     public function setMyConfig()
     {
-        $key = static::$key;
+        $key = self::getKey();
         $config = self::getLocalConfig();
         $data = &$config;
+        if (!$key) {
+            $config = array_merge($config, $this->attributes);
+        }
         while ($key) {
             $k = array_shift($key);
             $config[$k] = isset($config[$k]) ? $config[$k] : [];
@@ -85,12 +117,35 @@ class Config extends Model
 
     public static function getMyConfig()
     {
-        $key = static::$key;
+        $key = self::getKey();
         $config = self::getMainConfig();
         while ($key) {
             $k = array_shift($key);
             $config = isset($config[$k]) ? $config[$k] : [];
         }
         return $config;
+    }
+
+
+    public function removeMyConfig()
+    {
+        $key = self::getKey();
+        $config = self::getLocalConfig();
+        $data = &$config;
+        if (!$key) {
+            foreach ($this->attributes as $attribute => $value) {
+                unset($config[$attribute]);
+            }
+        }
+        while ($key) {
+            $k = array_shift($key);
+            if (!$key) {
+                unset($config[$k]);
+                break;
+            }
+            $config[$k] = isset($config[$k]) ? $config[$k] : [];
+            $config = &$config[$k];
+        }
+        return $data;
     }
 } 

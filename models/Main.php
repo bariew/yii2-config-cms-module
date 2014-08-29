@@ -3,41 +3,38 @@
 namespace bariew\configModule\models;
 
 use bariew\configModule\components\Config;
-use bariew\configModule\models\components\Db;
 use Yii;
 
 class Main extends Config
 {
-    protected static $key = [];
+    public $name = 'My Application';
+    public $language = 'en';
+    public $sourceLanguage = 'en-US';
+    public $layout = 'main';
+    public $charset = 'UTF-8';
+    public $version = '1.0';
 
-    public $id;
-    public $language;
-    public $components;
-    public $params;
+    protected static $key = [];
 
 
     public function rules()
     {
         return [
-            [['id', 'language'], 'required'],
-            [['id', 'language'], 'string'],
-            [['components', 'params'], 'safe']
+            [['name', 'language', 'sourceLanguage', 'charset'], 'required'],
+            [['charset', 'sourceLanguage', 'name', 'version', 'layout'], 'string'],
+            [['language'], 'string', 'min' => 2, 'max' => 2]
         ];
     }
 
     public function attributeLabels()
     {
         return [
-            'id'    => Yii::t('modules/config', 'Application name'),
             'language' => Yii::t('modules/config', 'Language'),
-            'components' => Yii::t('modules/config', 'Components'),
-            'params' => Yii::t('modules/config', 'Params'),
+            'sourceLanguage' => Yii::t('modules/config', 'Source language'),
+            'layout' => Yii::t('modules/config', 'Layout'),
+            'charset' => Yii::t('modules/config', 'Charset'),
+            'version' => Yii::t('modules/config', 'Version'),
+            'name' => Yii::t('modules/config', 'Application name'),
         ];
-    }
-
-
-    public static function validateConfig()
-    {
-        return Db::validateConfig();
     }
 }

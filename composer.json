@@ -10,6 +10,9 @@
             "email": "bariew@yandex.ru"
         }
     ],
+    "require" : {
+        "bariew/yii2-dropdown-x": "dev-master"
+    },
     "autoload": {
         "psr-4": {
             "bariew\\configModule\\": ""

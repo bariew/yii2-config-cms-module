@@ -3,11 +3,9 @@
 namespace bariew\configModule\controllers;
 
 use bariew\configModule\components\Config;
-use bariew\configModule\models\Main;
 use Yii;
-use yii\bootstrap\Nav;
 use yii\web\Controller;
-use yii\widgets\Menu;
+use yii\web\HttpException;
 
 /**
  * ItemController implements the CRUD actions for Item model.
@@ -16,17 +14,7 @@ class ItemController extends Controller
 {
     public function getMenu()
     {
-        $items = [];
-        foreach (Config::listAll() as $name) {
-            $path = explode('\\', $name);
-            $data = [
-                'label' => $name,
-                'url' => ['update', 'name' => $name],
-                'active' => Yii::$app->request->get('name') == $name
-            ];
-            $items[] = $data;
-        }
-        return Nav::widget(['items' => $items]);
+        return \bariew\configModule\widgets\Menu::widget();
     }
 
     public function actionIndex()
@@ -64,6 +52,9 @@ class ItemController extends Controller
     public function getModel($name)
     {
         $className = Config::getClass($name);
+        if (!class_exists($className)) {
+            throw new HttpException(404, Yii::t('modules/config', "Class does not exist"));
+        }
         return new $className();
     }
 }

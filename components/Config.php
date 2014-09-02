@@ -16,18 +16,65 @@ class Config extends Model
 {
     protected static $localConfigPath = '@app/config/local/main.php';
     protected static $mainConfigPath = '@app/config/web.php';
-
     protected static $key;
 
     public function init()
     {
         parent::init();
         foreach (self::getMyConfig() as $attribute => $value) {
-            if (!$this->hasProperty($attribute) || is_array($value)) {
+            if (!$this->hasProperty($attribute)) {
                 continue;
             }
-            $this->$attribute = $value;
+            $this->$attribute = is_array($value) ? json_encode($value) : $value;
         }
+    }
+
+    public function classValidation($attribute)
+    {
+        $class = $this->$attribute;
+        if (!class_exists($class)) {
+            $this->addError($attribute, Yii::t('modules/config', 'Class not found'));
+        }
+    }
+
+    public function jsonValidation($attribute)
+    {
+        json_decode($this->$attribute);
+        if (json_last_error()) {
+            $this->addError($attribute, json_last_error_msg());
+        }
+    }
+
+    public function getJsonAttributes()
+    {
+        $result = [];
+        foreach ($this->rules() as $rule) {
+            if (!in_array('jsonValidation', $rule)) {
+                continue;
+            }
+            $result = array_merge($result, (array) $rule[0]);
+        }
+        return $result;
+    }
+
+    public function decodeJsonAttributes()
+    {
+        foreach ($this->getJsonAttributes() as $attribute) {
+            $this->$attribute = json_decode($this->$attribute, true);
+        }
+    }
+
+    public function encodeJsonAttributes()
+    {
+        foreach ($this->getJsonAttributes() as $attribute) {
+            $this->$attribute = json_encode($this->$attribute);
+        }
+    }
+
+    public function beforeSave()
+    {
+        $this->decodeJsonAttributes();
+        return true;
     }
 
     public static function getKey()
@@ -80,17 +127,22 @@ class Config extends Model
 
     public function save()
     {
-        if (!$this->validate() || !$this->beforeSave()) {
+        if (!$this->validate()) {
+            return false;
+        }
+        if (!$this->beforeSave()) {
+            $this->encodeJsonAttributes();
             return false;
         }
         $content = '<?php return '. var_export($this->setMyConfig(), true) . ';';
-        $result = file_put_contents(\Yii::getAlias(self::$localConfigPath), $content);
-        $this->afterSave();
+        if ($result = file_put_contents(\Yii::getAlias(self::$localConfigPath), $content)) {
+            $this->afterSave();
+        };
+        $this->encodeJsonAttributes();
         return $result;
     }
 
-    public function beforeSave() { return true;}
-    public function afterSave() {}
+    public function afterSave(){}
 
     public function delete()
     {

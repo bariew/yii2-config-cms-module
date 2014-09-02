@@ -20,6 +20,7 @@ class Mail extends Config
     {
         return [
             [['class'], 'required'],
+            [['class', 'messageClass'], 'classValidation'],
             [['class', 'messageClass', 'htmlLayout', 'textLayout', 'useFileTransport', 'fileTransportPath'], 'string'],
         ];
     }

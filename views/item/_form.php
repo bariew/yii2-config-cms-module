@@ -14,7 +14,11 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin();  ?>
         <?php foreach($model->safeAttributes() as $attribute): ?>
-            <?= $form->field($model, $attribute)->textInput(); ?>
+            <?php if($model->getIsSerializable($attribute)) : ?>
+                <?= $form->field($model, $attribute)->textarea(); ?>
+            <?php else: ?>
+                <?= $form->field($model, $attribute)->textInput(); ?>
+            <?php endif; ?>
         <?php endforeach; ?>
         <div class="form-group">
             <?php echo Html::a(Yii::t('modules/config', 'Reset'), ['delete', 'name'=>$model::getName()], ['class' => 'btn btn-danger']); ?>

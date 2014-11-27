@@ -18,6 +18,8 @@ class Config extends Model
     protected static $mainConfigPath = '@app/config/web.php';
     protected static $key;
 
+    protected $serializedAttributes = [];
+
     public function init()
     {
         parent::init();
@@ -25,7 +27,11 @@ class Config extends Model
             if (!$this->hasProperty($attribute)) {
                 continue;
             }
-            $this->$attribute = is_array($value) ? json_encode($value) : $value;
+            if (is_array($value)) {
+                $this->serializedAttributes[] = $attribute;
+                $value = json_encode($value);
+            }
+            $this->$attribute = $value;
         }
     }
 
@@ -45,30 +51,23 @@ class Config extends Model
         }
     }
 
-    public function getJsonAttributes()
-    {
-        $result = [];
-        foreach ($this->rules() as $rule) {
-            if (!in_array('jsonValidation', $rule)) {
-                continue;
-            }
-            $result = array_merge($result, (array) $rule[0]);
-        }
-        return $result;
-    }
-
     public function decodeJsonAttributes()
     {
-        foreach ($this->getJsonAttributes() as $attribute) {
+        foreach ($this->serializedAttributes as $attribute) {
             $this->$attribute = json_decode($this->$attribute, true);
         }
     }
 
     public function encodeJsonAttributes()
     {
-        foreach ($this->getJsonAttributes() as $attribute) {
+        foreach ($this->serializedAttributes as $attribute) {
             $this->$attribute = json_encode($this->$attribute);
         }
+    }
+
+    public function getIsSerializable($attribute)
+    {
+        return in_array($attribute, $this->serializedAttributes);
     }
 
     public function beforeSave()
@@ -153,7 +152,7 @@ class Config extends Model
     public function setMyConfig()
     {
         $key = self::getKey();
-        $config = self::getLocalConfig();
+        $config = self::getMainConfig();
         $data = &$config;
         if (!$key) {
             $config = array_merge($config, $this->attributes);
@@ -182,7 +181,7 @@ class Config extends Model
     public function removeMyConfig()
     {
         $key = self::getKey();
-        $config = self::getLocalConfig();
+        $config = self::getMainConfig();
         $data = &$config;
         if (!$key) {
             foreach ($this->attributes as $attribute => $value) {

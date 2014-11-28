@@ -8,14 +8,13 @@
 
 namespace bariew\configModule\components;
 
+use app\config\FileModel;
 use yii\base\Model;
 use Yii;
 use yii\helpers\FileHelper;
 
 class Config extends Model
 {
-    protected static $localConfigPath = '@app/config/local/main.php';
-    protected static $mainConfigPath = '@app/config/web.php';
     protected static $key;
 
     protected $serializedAttributes = [];
@@ -23,7 +22,7 @@ class Config extends Model
     public function init()
     {
         parent::init();
-        foreach (self::getMyConfig() as $attribute => $value) {
+        foreach ($this->getConfig()->get(self::getKey()) as $attribute => $value) {
             if (!$this->hasProperty($attribute)) {
                 continue;
             }
@@ -45,8 +44,8 @@ class Config extends Model
 
     public function jsonValidation($attribute)
     {
-        json_decode($this->$attribute);
-        if (json_last_error()) {
+        $data = json_decode($this->$attribute);
+        if (!is_array($data) || json_last_error()) {
             $this->addError($attribute, json_last_error_msg());
         }
     }
@@ -112,18 +111,6 @@ class Config extends Model
         return self::getBaseModelNamespace(). '\\' . $name;
     }
 
-    protected static function getMainConfig()
-    {
-        $path = Yii::getAlias(self::$mainConfigPath);
-        return file_exists($path) ? require $path : [];
-    }
-
-    protected static function getLocalConfig()
-    {
-        $path = Yii::getAlias(self::$localConfigPath);
-        return file_exists($path) ? require $path : [];
-    }
-
     public function save()
     {
         if (!$this->validate()) {
@@ -133,8 +120,7 @@ class Config extends Model
             $this->encodeJsonAttributes();
             return false;
         }
-        $content = '<?php return '. var_export($this->setMyConfig(), true) . ';';
-        if ($result = file_put_contents(\Yii::getAlias(self::$localConfigPath), $content)) {
+        if ($result = $this->getConfig()->set(self::getKey(), $this->attributes)) {
             $this->afterSave();
         };
         $this->encodeJsonAttributes();
@@ -143,60 +129,10 @@ class Config extends Model
 
     public function afterSave(){}
 
-    public function delete()
+    protected function getConfig()
     {
-        $content = '<?php return '. var_export($this->removeMyConfig(), true) . ';';
-        return file_put_contents(\Yii::getAlias(self::$localConfigPath), $content);
-    }
-
-    public function setMyConfig()
-    {
-        $key = self::getKey();
-        $config = self::getMainConfig();
-        $data = &$config;
-        if (!$key) {
-            $config = array_merge($config, $this->attributes);
-        }
-        while ($key) {
-            $k = array_shift($key);
-            $config[$k] = isset($config[$k]) ? $config[$k] : [];
-            $config[$k] = $key ? $config[$k] : array_merge($config[$k], $this->attributes);
-            $config = &$config[$k];
-        }
-        return $data;
-    }
-
-    public static function getMyConfig()
-    {
-        $key = self::getKey();
-        $config = self::getMainConfig();
-        while ($key) {
-            $k = array_shift($key);
-            $config = isset($config[$k]) ? $config[$k] : [];
-        }
-        return $config;
-    }
-
-
-    public function removeMyConfig()
-    {
-        $key = self::getKey();
-        $config = self::getMainConfig();
-        $data = &$config;
-        if (!$key) {
-            foreach ($this->attributes as $attribute => $value) {
-                unset($config[$attribute]);
-            }
-        }
-        while ($key) {
-            $k = array_shift($key);
-            if (!$key) {
-                unset($config[$k]);
-                break;
-            }
-            $config[$k] = isset($config[$k]) ? $config[$k] : [];
-            $config = &$config[$k];
-        }
-        return $data;
+        return new \bariew\phptools\FileModel(Yii::getAlias('@app/config/web.php'), [
+            'writePath' => Yii::getAlias('@app/config/local/main.php')
+        ]);
     }
 } 

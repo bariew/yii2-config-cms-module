@@ -11,7 +11,8 @@
         }
     ],
     "require" : {
-        "bariew/yii2-dropdown-x": "dev-master"
+        "bariew/yii2-dropdown-x": "dev-master",
+        "bariew/phptools": "dev-master"
     },
     "autoload": {
         "psr-4": {

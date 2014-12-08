@@ -13,6 +13,7 @@ class Main extends Config
     public $layout = 'main';
     public $charset = 'UTF-8';
     public $version = '1.0';
+    public $bootstrap = [];
 
     protected static $key = [];
 
@@ -22,7 +23,8 @@ class Main extends Config
         return [
             [['name', 'language', 'sourceLanguage', 'charset'], 'required'],
             [['charset', 'sourceLanguage', 'name', 'version', 'layout'], 'string'],
-            [['language'], 'string', 'min' => 2, 'max' => 2]
+            [['language'], 'string', 'min' => 2, 'max' => 2],
+            [['bootstrap'], 'safe'],
         ];
     }
 

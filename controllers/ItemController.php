@@ -30,20 +30,7 @@ class ItemController extends Controller
         $model = $this->getModel($name);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', Yii::t('modules/config', 'Saved'));
-        }
-        return $this->render('update', compact('model'));
-
-    }
-
-    public function actionDelete($name)
-    {
-        /**
-         * @var Config $model
-         */
-        $model = $this->getModel($name);
-        if ($model->delete()) {
-            Yii::$app->session->setFlash('success', Yii::t('modules/config', 'Deleted'));
-            return $this->redirect(['index']);
+            return $this->refresh();
         }
         return $this->render('update', compact('model'));
 

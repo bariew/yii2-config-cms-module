@@ -19,7 +19,9 @@ class Db extends Config
     {
         return [
             [['dsn', 'username'], 'required'],
-            [['dsn', 'username', 'password'], 'string'],
+            [['dsn', 'username', 'password', 'charset'], 'string'],
+            [['enableSchemaCache'], 'in', 'range' => [0,1]],
+            [['schemaCacheDuration'], 'integer'],
             [['dsn'], 'dbValidate'],
         ];
     }

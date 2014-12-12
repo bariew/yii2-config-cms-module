@@ -8,7 +8,7 @@
 
 namespace bariew\configModule\components;
 
-use app\config\FileModel;
+use app\config\ConfigManager;
 use yii\base\Model;
 use Yii;
 use yii\helpers\FileHelper;
@@ -22,7 +22,7 @@ class Config extends Model
     public function init()
     {
         parent::init();
-        foreach ($this->getConfig()->get(self::getKey()) as $attribute => $value) {
+        foreach (ConfigManager::get(self::getKey()) as $attribute => $value) {
             if (!$this->hasProperty($attribute)) {
                 continue;
             }
@@ -120,7 +120,7 @@ class Config extends Model
             $this->encodeJsonAttributes();
             return false;
         }
-        if ($result = $this->getConfig()->set(self::getKey(), $this->attributes)) {
+        if ($result = ConfigManager::set(self::getKey(), $this->attributes)) {
             $this->afterSave();
         };
         $this->encodeJsonAttributes();
@@ -128,11 +128,4 @@ class Config extends Model
     }
 
     public function afterSave(){}
-
-    protected function getConfig()
-    {
-        return new \bariew\phptools\FileModel(Yii::getAlias('@app/config/web.php'), [
-            'writePath' => Yii::getAlias('@app/config/local/main.php')
-        ]);
-    }
 } 

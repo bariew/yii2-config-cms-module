@@ -15,15 +15,19 @@ class Request extends Config
     public $cookieValidationKey = '';
     public $methodParam = '_method';
 
+    /**
+     * @inheritdoc
+     */
+    protected $jsonAttributes = ['acceptableContentTypes', 'acceptableLanguages'];
 
     public function rules()
     {
         return [
             [['class'], 'required'],
             [['class'], 'classValidation'],
-            //[['acceptableContentTypes', 'acceptableLanguages'], 'jsonValidation'],
             [['enableCookieValidation', 'enableCsrfValidation'], 'in', 'range' => [0,1]],
             [['cookieValidationKey', 'methodParam'], 'string', 'min'=>3, 'skipOnEmpty' => false],
+            [['acceptableContentTypes', 'acceptableLanguages'], 'safe'],
         ];
     }
 

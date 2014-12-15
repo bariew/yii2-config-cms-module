@@ -15,8 +15,12 @@ class Main extends Config
     public $version = '1.0';
     public $bootstrap = [];
 
-    protected static $key = [];
+    /**
+     * @inheritdoc
+     */
+    protected $jsonAttributes = ['bootstrap'];
 
+    protected static $key = [];
 
     public function rules()
     {

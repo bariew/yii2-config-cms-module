@@ -17,7 +17,7 @@ class Config extends Model
 {
     protected static $key;
 
-    protected $serializedAttributes = [];
+    protected $jsonAttributes = [];
 
     public function init()
     {
@@ -27,11 +27,12 @@ class Config extends Model
                 continue;
             }
             if (is_array($value)) {
-                $this->serializedAttributes[] = $attribute;
+                $this->jsonAttributes[] = $attribute;
                 $value = json_encode($value);
             }
             $this->$attribute = $value;
         }
+        $this->jsonAttributes = array_unique($this->jsonAttributes);
     }
 
     public function classValidation($attribute)
@@ -52,21 +53,29 @@ class Config extends Model
 
     public function decodeJsonAttributes()
     {
-        foreach ($this->serializedAttributes as $attribute) {
+        foreach ($this->jsonAttributes as $attribute) {
             $this->$attribute = json_decode($this->$attribute, true);
         }
     }
 
     public function encodeJsonAttributes()
     {
-        foreach ($this->serializedAttributes as $attribute) {
+        foreach ($this->jsonAttributes as $attribute) {
             $this->$attribute = json_encode($this->$attribute);
         }
     }
 
     public function getIsSerializable($attribute)
     {
-        return in_array($attribute, $this->serializedAttributes);
+        return in_array($attribute, $this->jsonAttributes);
+    }
+
+    public function beforeValidate()
+    {
+        foreach ($this->jsonAttributes as $attribute) {
+            $this->jsonValidation($attribute);
+        }
+        return parent::beforeValidate();
     }
 
     public function beforeSave()

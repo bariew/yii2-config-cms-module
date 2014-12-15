@@ -30,13 +30,18 @@ class I18n extends Config
      */
     public $translations;
 
+    /**
+     * @inheritdoc
+     */
+    protected $jsonAttributes = ['translations'];
+
 
     public function rules()
     {
         return [
             [['class'], 'required'],
             [['class'], 'classValidation'],
-            [['translations'], 'jsonValidation'],
+            [['translations'], 'safe'],
         ];
     }
 

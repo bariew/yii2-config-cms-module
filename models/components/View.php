@@ -34,6 +34,10 @@ class View extends Config
      */
     public $theme;
 
+    /**
+     * @inheritdoc
+     */
+    protected $jsonAttributes = ['theme', 'renderers'];
 
     public function rules()
     {
@@ -42,7 +46,7 @@ class View extends Config
             [['class'], 'classValidation'],
             [['renderers'], 'default', 'value' => null],
             [['defaultExtension'], 'string'],
-            [['theme', 'renderers'], 'jsonValidation'],
+            [['theme', 'renderers'], 'safe'],
         ];
     }
 

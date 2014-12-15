@@ -12,6 +12,8 @@ use yii\web\HttpException;
  */
 class ItemController extends Controller
 {
+    public $enableCsrfValidation = false;
+
     public function getMenu()
     {
         return \bariew\configModule\widgets\Menu::widget();

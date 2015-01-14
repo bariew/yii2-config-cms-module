@@ -27,6 +27,9 @@ class ConfigBootstrap implements BootstrapInterface
         if (!$app instanceof Application) {
             return true;
         }
+        if (!Module::isEnabled()) {
+            return true;
+        }
         if (!Db::validateConfig()) {
             $module = new Module('config');
             \Yii::$app->controller = $controller = new ItemController('item', $module);

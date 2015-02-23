@@ -47,7 +47,7 @@ class Config extends Model
     {
         $data = json_decode($this->$attribute);
         if (!is_array($data) || json_last_error()) {
-            $this->addError($attribute, json_last_error_msg());
+            $this->addError($attribute, Yii::t('modules/config', "Json format error"));
         }
     }
 
